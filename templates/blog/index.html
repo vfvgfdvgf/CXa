@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+{% load seo_images %}
+
+{% block content %}
+<section class="page-hero compact{% if blog_hero_background %} hero-has-bg blog-hero-has-bg{% endif %}"{% if blog_hero_background %} style="--hero-bg-image:url('{{ blog_hero_background }}');"{% endif %}>
+    <div class="container page-hero-shell">
+        <div>
+            <span class="eyebrow">المدونة</span>
+            <h1>{% if current_taxonomy_title %}{{ current_taxonomy_title }}{% else %}مقالات SEO عربية لرفع الظهور العضوي{% endif %}</h1>
+            <p>محتوى عربي مصمم لالتقاط الزيارات من محركات البحث وتحويلها إلى عملاء فعليين عبر مقالات منظمة وعملية.</p>
+        </div>
+        {% with hero_image=page_images|first %}
+            {% if hero_image %}
+            <figure class="page-hero-visual">
+                {% image_srcset hero_image.image_url as srcset %}
+
+                <img src="{{ hero_image.image_url }}" {% if srcset %}srcset="{{ srcset }}" sizes="(max-width: 720px) 100vw, 50vw"{% endif %} alt="{{ hero_image.display_alt }}" loading="lazy">
+            </figure>
+            {% else %}
+            <div class="page-hero-note">
+                <strong>محرك زيارات مستمر</strong>
+                <span>بحث، تصنيفات، وسوم، ومقالات مترابطة داخليًا لرفع فرص الظهور في Google وتحسين وقت بقاء الزائر.</span>
+            </div>
+            {% endif %}
+        {% endwith %}
+    </div>
+</section>
+
+{% if featured_posts %}
+<section class="section">
+    <div class="container">
+        <div class="section-heading">
+            <span class="eyebrow">مقالات مميزة</span>
+            <h2>محتوى مختار بعناية لجذب زيارات ذات نية شرائية</h2>
+        </div>
+        <div class="blog-grid">
+            {% for post in featured_posts %}
+                <article class="blog-card reveal">
+                    <span class="post-chip">مميز</span>
+                    <h3><a href="{% url 'blog_detail' post.slug %}">{{ post.title }}</a></h3>
+                    <p>{% firstof post.meta_description post.excerpt post.intro %}</p>
+                    <a class="text-link" href="{% url 'blog_detail' post.slug %}">قراءة المقال</a>
+                </article>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<section class="section">
+    <div class="container blog-layout">
+        <aside class="blog-sidebar">
+            <form class="search-form" method="get" action="{% url 'blog' %}">
+                <label for="blog-search">ابحث في المقالات</label>
+                <div class="search-row">
+                    <input id="blog-search" type="search" name="q" value="{{ search_query }}" placeholder="ابحث عن لاندسكيب، حدائق، أشجار، نخيل...">
+                    <button class="btn btn-primary" type="submit">بحث</button>
+                </div>
+            </form>
+
+            {% if categories %}
+            <div class="sidebar-card">
+                <h3>التصنيفات</h3>
+                <div class="taxonomy-list">
+                    {% for item in categories %}
+                    <a class="{% if active_category == item.slug %}active{% endif %}" href="{% url 'blog_category' item.slug %}">{{ item.name }}</a>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            {% if tags_cloud %}
+            <div class="sidebar-card">
+                <h3>الوسوم الشائعة</h3>
+                <div class="tag-cloud">
+                    {% for item in tags_cloud %}
+                    <a href="{% url 'blog_tag' item.slug %}">{{ item.name }}</a>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            {% if popular_posts %}
+            <div class="sidebar-card">
+                <h3>الأكثر قراءة</h3>
+                <div class="popular-posts">
+                    {% for item in popular_posts %}
+                    <a href="{% url 'blog_detail' item.slug %}">{{ item.title }}</a>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </aside>
+
+        <div class="blog-main">
+            <div class="blog-listing">
+                {% for post in posts %}
+                <article class="blog-card reveal">
+                    {% if post.image_url %}
+                    {% image_srcset post.image_url as srcset %}
+
+                    <img src="{{ post.image_url }}" {% if srcset %}srcset="{{ srcset }}" sizes="(max-width: 720px) 100vw, 50vw"{% endif %} alt="{{ post.title }}" loading="lazy">
+                    {% elif page_images %}
+                    {% image_srcset page_images.0.image_url as srcset %}
+
+                    <img src="{{ page_images.0.image_url }}" {% if srcset %}srcset="{{ srcset }}" sizes="(max-width: 720px) 100vw, 50vw"{% endif %} alt="{{ post.title }}" loading="lazy">
+                    {% endif %}
+                    <div class="blog-card-body">
+                        {% if post.category %}<span class="post-chip">{{ post.category.name }}</span>{% endif %}
+                        <h2><a href="{% url 'blog_detail' post.slug %}">{{ post.title }}</a></h2>
+                        <p>{% firstof post.meta_description post.excerpt post.intro %}</p>
+                        <div class="post-meta">
+                            {% if post.publish_at %}<span>{{ post.publish_at|date:"Y-m-d" }}</span>{% endif %}
+                            {% if post.reading_time_minutes %}<span>{{ post.reading_time_minutes }} دقائق قراءة</span>{% endif %}
+                        </div>
+                        <a class="text-link" href="{% url 'blog_detail' post.slug %}">قراءة المقال</a>
+                    </div>
+                </article>
+                {% empty %}
+                <article class="content-card">
+                    <h2>لا توجد مقالات مطابقة حاليًا</h2>
+                    <p>جرّب البحث بكلمة أخرى أو انتقل إلى تصنيف مختلف.</p>
+                </article>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</section>
+{% include "partials/managed_gallery.html" with images=page_images %}
+{% endblock %}

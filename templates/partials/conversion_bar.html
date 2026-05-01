@@ -1,0 +1,22 @@
+<aside class="conversion-bar" aria-label="طلب خدمة سريع">
+    <div class="conversion-copy">
+        <strong>جاهز نعاين موقعك؟</strong>
+        <span>أرسل المدينة والصور والمساحة ونرد عليك بعرض مناسب.</span>
+    </div>
+    <form class="conversion-mini-form" data-whatsapp="{{ whatsapp_url }}" data-lead-url="{% url 'capture_lead' %}">
+        <input type="text" name="city" placeholder="المدينة" aria-label="المدينة">
+        <select name="service" aria-label="الخدمة">
+            <option value="">نوع الخدمة</option>
+            <option>توريد نخيل</option>
+            <option>تكريب أو تشذيب نخيل</option>
+            <option>لاندسكيب وتنسيق حدائق</option>
+            <option>توريد أشجار وثيل</option>
+            <option>شبوك أو مظلات</option>
+        </select>
+        <button class="btn btn-primary" type="submit">طلب سريع</button>
+    </form>
+    <div class="conversion-actions">
+        <a class="btn btn-outline" href="tel:{{ contact_phone }}">اتصال</a>
+        <a class="btn btn-primary" href="{{ whatsapp_url }}" target="_blank" rel="noopener">واتساب</a>
+    </div>
+</aside>

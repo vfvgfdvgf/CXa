@@ -1,0 +1,202 @@
+{% extends "base.html" %}
+{% load seo_images %}
+
+{% block extra_head %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "{{ post.title }}",
+  "description": "{{ seo.description }}",
+  "author": {"@type": "Organization", "name": "{{ site_name }}"},
+  "mainEntityOfPage": "{{ share_url }}"
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="reading-progress"><span data-reading-progress-bar></span></div>
+<article class="section article-shell" data-reading-target data-track-url="{% url 'blog_track_read' post.slug %}">
+    <div class="container article-layout">
+        <div class="article-main">
+            <nav class="breadcrumbs" aria-label="Breadcrumb">
+                <a href="{% url 'home' %}">الرئيسية</a>
+                <span>/</span>
+                <a href="{% url 'blog' %}">المدونة</a>
+                <span>/</span>
+                <span>{{ post.title }}</span>
+            </nav>
+
+            <span class="eyebrow">مقالة متخصصة</span>
+            <h1>{{ post.title }}</h1>
+            <p class="lead">{{ article_intro }}</p>
+
+            <div class="post-meta">
+                {% if post.category %}<span>{{ post.category.name }}</span>{% endif %}
+                {% if post.publish_at %}<span>{{ post.publish_at|date:"Y-m-d" }}</span>{% endif %}
+                {% if post.reading_time_minutes %}<span>{{ post.reading_time_minutes }} دقائق قراءة</span>{% endif %}
+                {% if post.view_count %}<span>{{ post.view_count }} مشاهدة</span>{% endif %}
+            </div>
+
+            <div class="article-insights">
+                <div class="insight-card">
+                    <strong>فائدة المقال</strong>
+                    <span>محتوى عملي يساعد الزائر على الفهم واتخاذ قرار أسرع.</span>
+                </div>
+                <div class="insight-card">
+                    <strong>الهدف</strong>
+                    <span>تحويل الباحث من Google إلى تواصل مباشر أو طلب عرض سعر.</span>
+                </div>
+                <div class="insight-card">
+                    <strong>النتيجة</strong>
+                    <span>معلومات أوضح وربط داخلي أفضل وتجربة قراءة أكثر احترافية.</span>
+                </div>
+            </div>
+
+            {% if post.image_url %}
+            <figure class="article-cover">
+                {% image_srcset post.image_url as srcset %}
+
+                <img src="{{ post.image_url }}" {% if srcset %}srcset="{{ srcset }}" sizes="(max-width: 720px) 100vw, 50vw"{% endif %} alt="{{ post.title }}" loading="lazy">
+            </figure>
+            {% elif page_images %}
+            <figure class="article-cover">
+                {% image_srcset page_images.0.image_url as srcset %}
+
+                <img src="{{ page_images.0.image_url }}" {% if srcset %}srcset="{{ srcset }}" sizes="(max-width: 720px) 100vw, 50vw"{% endif %} alt="{{ post.title }}" loading="lazy">
+            </figure>
+            {% endif %}
+
+            {% if article_sections %}
+            <section class="article-summary">
+                <h2>ملخص سريع للمقال</h2>
+                <div class="summary-grid">
+                    {% for section in article_sections %}
+                    <a href="#section-{{ forloop.counter }}">{{ section.heading }}</a>
+                    {% endfor %}
+                </div>
+            </section>
+            {% endif %}
+
+            <div class="article-share">
+                <a class="btn btn-soft" href="https://wa.me/?text={{ share_url }}" target="_blank" rel="noopener">مشاركة واتساب</a>
+                <a class="btn btn-soft" href="https://twitter.com/intent/tweet?url={{ share_url }}&text={{ post.title }}" target="_blank" rel="noopener">مشاركة X</a>
+                <button class="btn btn-soft" type="button" data-copy-link="{{ share_url }}">نسخ الرابط</button>
+            </div>
+
+            {% if article_sections %}
+                {% for section in article_sections %}
+                <section class="article-section" id="section-{{ forloop.counter }}">
+                    <h2>{{ section.heading }}</h2>
+                    <p>{{ section.body }}</p>
+                </section>
+                {% endfor %}
+            {% else %}
+            <section class="article-section article-content">
+                {% if post.content and "<" in post.content and ">" in post.content %}
+                    {{ post.content|safe }}
+                {% else %}
+                    {{ post.content|linebreaks }}
+                {% endif %}
+            </section>
+            {% endif %}
+
+            {% if post.tags.all %}
+            <div class="article-tags">
+                <h3>وسوم المقال</h3>
+                <div class="tag-cloud">
+                    {% for tag in post.tags.all %}
+                    <a href="{% url 'blog_tag' tag.slug %}">{{ tag.name }}</a>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="cta-box article-cta">
+                <div>
+                    <span class="eyebrow">حوّل القراءة إلى طلب فعلي</span>
+                    <h2>اطلب عرض سعر الآن أو تواصل عبر واتساب مباشرة</h2>
+                </div>
+                <div class="hero-actions">
+                    <a class="btn btn-primary" href="{{ whatsapp_url }}" target="_blank" rel="noopener">واتساب</a>
+                    <a class="btn btn-outline" href="{% url 'contact' %}">تواصل معنا</a>
+                </div>
+            </div>
+
+            {% if related_posts %}
+            <section class="article-related">
+                <div class="section-heading">
+                    <span class="eyebrow">مقالات ذات صلة</span>
+                    <h2>روابط داخلية لمقالات مرتبطة بنفس الموضوع</h2>
+                </div>
+                <div class="blog-grid">
+                    {% for item in related_posts %}
+                    <article class="blog-card">
+                        <h3><a href="{% url 'blog_detail' item.slug %}">{{ item.title }}</a></h3>
+                        <p>{% firstof item.meta_description item.excerpt item.intro %}</p>
+                        <a class="text-link" href="{% url 'blog_detail' item.slug %}">قراءة المقال</a>
+                    </article>
+                    {% endfor %}
+                </div>
+            </section>
+            {% endif %}
+
+            <section class="comment-section">
+                <div class="section-heading">
+                    <span class="eyebrow">التعليقات</span>
+                    <h2>أضف تعليقك وسيتم مراجعته قبل النشر</h2>
+                </div>
+                <form method="post" class="quote-form">
+                    {% csrf_token %}
+                    {{ comment_form.as_p }}
+                    <button class="btn btn-primary" type="submit">إرسال التعليق</button>
+                </form>
+
+                {% if approved_comments %}
+                <div class="comments-list">
+                    {% for comment in approved_comments %}
+                    <article class="content-card">
+                        <strong>{{ comment.author_name }}</strong>
+                        <p>{{ comment.content }}</p>
+                    </article>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </section>
+        </div>
+
+        <aside class="blog-sidebar article-sidebar">
+            {% if article_sections %}
+            <div class="sidebar-card">
+                <h3>فهرس المقال</h3>
+                <div class="taxonomy-list">
+                    {% for section in article_sections %}
+                    <a href="#section-{{ forloop.counter }}">{{ section.heading }}</a>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+            {% if post.category %}
+            <div class="sidebar-card">
+                <h3>التصنيف</h3>
+                <a class="text-link" href="{% url 'blog_category' post.category.slug %}">{{ post.category.name }}</a>
+            </div>
+            {% endif %}
+            <div class="sidebar-card">
+                <h3>مؤشرات المقال</h3>
+                <div class="taxonomy-list">
+                    {% if post.reading_time_minutes %}<span class="metric-pill">{{ post.reading_time_minutes }} دقائق قراءة</span>{% endif %}
+                    {% if post.view_count %}<span class="metric-pill">{{ post.view_count }} مشاهدة</span>{% endif %}
+                    <span class="metric-pill">{% if post.avg_read_seconds %}{{ post.avg_read_seconds }} ثانية متوسط قراءة{% else %}قراءة مريحة بالعربية{% endif %}</span>
+                </div>
+            </div>
+            <div class="sidebar-card">
+                <h3>تحويل سريع</h3>
+                <a class="btn btn-primary" href="{{ whatsapp_url }}" target="_blank" rel="noopener">اطلب عرض سعر الآن</a>
+                <a class="btn btn-soft" href="tel:{{ contact_phone }}">اتصال مباشر</a>
+            </div>
+        </aside>
+    </div>
+</article>
+{% include "partials/managed_gallery.html" with images=page_images %}
+{% endblock %}

@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% load seo_images %}
+
+{% block content %}
+<section class="page-hero compact">
+    <div class="container page-hero-shell">
+        <div>
+            <span class="eyebrow">خدماتنا</span>
+            <h1>خدمات متخصصة للاندسكيب وتصميم الحدائق وزراعة الأشجار والنخيل</h1>
+            <p>صفحة مرتبة تجمع الخدمات الأساسية مع صور حقيقية ومزايا واضحة وروابط داخلية قوية لتحسين التجربة والظهور في البحث.</p>
+        </div>
+        {% with hero_image=page_images|first %}
+            {% if hero_image %}
+            <figure class="page-hero-visual">
+                {% image_srcset hero_image.image_url as srcset %}
+
+                <img src="{{ hero_image.image_url }}" {% if srcset %}srcset="{{ srcset }}" sizes="(max-width: 720px) 100vw, 50vw"{% endif %} alt="{{ hero_image.display_alt }}" loading="lazy">
+            </figure>
+            {% endif %}
+        {% endwith %}
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <div class="section-heading split-heading">
+            <div>
+                <span class="eyebrow">اختيار الخدمة</span>
+                <h2>خدمات مرتبة بصور ومحتوى مختصر يساعد على اتخاذ القرار بسرعة</h2>
+            </div>
+            <p>كل خدمة موضحة بصريًا مع فوائد واضحة وروابط مباشرة للمدن وطلب عرض السعر.</p>
+        </div>
+        <div class="cards-grid">
+            {% for service in services %}
+            <article class="service-card reveal" id="{{ service.slug }}">
+                {% if service.image %}
+                {% image_srcset service.image as srcset %}
+
+                <img src="{{ service.image }}" {% if srcset %}srcset="{{ srcset }}" sizes="(max-width: 720px) 100vw, 50vw"{% endif %} alt="{{ service.name }}" loading="lazy">
+                {% endif %}
+                <h2>{{ service.name }}</h2>
+                <p>{{ service.description }}</p>
+                <ul>
+                    {% for benefit in service.benefits %}
+                    <li>{{ benefit }}</li>
+                    {% endfor %}
+                </ul>
+                <div class="service-links">
+                    <a class="btn btn-outline" href="{% url 'service_detail' service.slug %}">تفاصيل الخدمة</a>
+                    <a class="btn btn-outline" href="{% url 'cities' %}">اختر المدينة</a>
+                    <a class="btn btn-primary" href="{{ whatsapp_url }}" target="_blank" rel="noopener">اطلب سعرًا</a>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+{% if page_images %}
+<section class="section muted">
+    <div class="container">
+        <div class="section-heading">
+            <span class="eyebrow">صور الخدمات</span>
+            <h2>معرض بصري يدعم فهم نوع التنفيذ والخامة والشكل النهائي</h2>
+        </div>
+        <div class="photo-wall">
+            {% for item in page_images %}
+            <figure class="photo-wall-card reveal {% if forloop.first %}photo-wall-card-wide{% endif %}">
+                {% image_srcset item.image_url as srcset %}
+
+                <img src="{{ item.image_url }}" {% if srcset %}srcset="{{ srcset }}" sizes="(max-width: 720px) 100vw, 50vw"{% endif %} alt="{{ item.display_alt }}" loading="lazy">
+                <figcaption>{{ item.title }}</figcaption>
+            </figure>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<section class="section">
+    <div class="container process-grid">
+        <article class="process-card reveal">
+            <strong>1</strong>
+            <h3>استلام الطلب</h3>
+            <p>نراجع نوع الخدمة والمدينة والمقاسات المطلوبة لتحديد المسار الأنسب للمشروع.</p>
+        </article>
+        <article class="process-card reveal">
+            <strong>2</strong>
+            <h3>المعاينة أو التقييم</h3>
+            <p>نحدد الخامة والتصميم والاحتياج الفعلي للموقع قبل بدء التنفيذ.</p>
+        </article>
+        <article class="process-card reveal">
+            <strong>3</strong>
+            <h3>التنفيذ والتسليم</h3>
+            <p>ننفذ بسرعة مع تشطيب مرتب ونتيجة نهائية تركز على الجودة والمظهر والاستدامة.</p>
+        </article>
+    </div>
+</section>
+{% endblock %}

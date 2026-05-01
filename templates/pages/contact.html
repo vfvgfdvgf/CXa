@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% load seo_images %}
+
+{% block content %}
+<section class="page-hero compact">
+    <div class="container page-hero-shell">
+        <div>
+            <span class="eyebrow">اتصل بنا</span>
+            <h1>تواصل سريع لطلب عرض سعر</h1>
+            <p>اختر رقم التواصل المناسب لك أو أرسل مباشرة عبر واتساب.</p>
+        </div>
+        {% with hero_image=page_images|first %}
+            {% if hero_image %}
+            <figure class="page-hero-visual">
+                {% image_srcset hero_image.image_url as srcset %}
+
+                <img src="{{ hero_image.image_url }}" {% if srcset %}srcset="{{ srcset }}" sizes="(max-width: 720px) 100vw, 50vw"{% endif %} alt="{{ hero_image.display_alt }}" loading="lazy">
+            </figure>
+            {% else %}
+            <div class="page-hero-note">
+                <strong>استجابة سريعة</strong>
+                <span>نحتاج اسمك، المدينة، ونوع الخدمة للبدء مباشرة.</span>
+            </div>
+            {% endif %}
+        {% endwith %}
+    </div>
+</section>
+
+<section class="section">
+    <div class="container two-col">
+        <article class="content-card">
+            <h2>معلومات التواصل</h2>
+            {% for item in contact_numbers %}
+            <p><strong>{{ item.label }}:</strong> <a href="tel:{{ item.phone }}">{{ item.phone }}</a></p>
+            {% if item.enable_whatsapp %}
+            <p><strong>واتساب {{ item.label }}:</strong> <a href="https://wa.me/{{ item.whatsapp_digits }}" target="_blank" rel="noopener">ابدأ المحادثة</a></p>
+            {% endif %}
+            {% endfor %}
+            <p><strong>التغطية:</strong> جميع مدن السعودية</p>
+        </article>
+
+        <form class="quote-form" data-whatsapp="{{ whatsapp_url }}" data-lead-url="{% url 'capture_lead' %}">
+            <h2>طلب عرض سعر سريع</h2>
+            <label>الاسم
+                <input type="text" name="name" placeholder="الاسم">
+            </label>
+            <label>المدينة
+                <input type="text" name="city" placeholder="الرياض">
+            </label>
+            <label>الخدمة
+                <select name="service">
+                    {% for key, service in services_map.items %}
+                    <option value="{{ service.name }}">{{ service.name }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+            <label>تفاصيل المشروع
+                <textarea name="details" rows="5" placeholder="اكتب المساحة أو المتطلبات باختصار"></textarea>
+            </label>
+            <div class="hero-actions">
+                <a class="btn btn-outline" href="tel:{{ phone }}">اتصال مباشر</a>
+                <button class="btn btn-primary" type="submit">إرسال عبر واتساب</button>
+            </div>
+        </form>
+    </div>
+</section>
+
+{% include "partials/managed_gallery.html" with images=page_images %}
+{% endblock %}

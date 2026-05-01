@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+{% load seo_images %}
+
+{% block extra_head %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Service",
+  "name": "{{ service.name|escapejs }}",
+  "description": "{{ seo.description|escapejs }}",
+  "provider": {
+    "@type": "LocalBusiness",
+    "name": "{{ site_name|escapejs }}",
+    "telephone": "{{ contact_phone|escapejs }}",
+    "url": "{{ request.scheme }}://{{ request.get_host }}/"
+  },
+  "areaServed": "SA",
+  "serviceType": "{{ service.name|escapejs }}",
+  "url": "{{ seo.canonical|escapejs }}"
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "هل تتوفر خدمة {{ service.name|escapejs }} في الرياض وجميع المدن؟",
+      "acceptedAnswer": {"@type": "Answer", "text": "نعم، نوفر الخدمة في الرياض والمدن الرئيسية مع ربط كل مدينة بصفحة محلية مخصصة."}
+    },
+    {
+      "@type": "Question",
+      "name": "هل يمكن دمج الخدمة مع اللاندسكيب والري؟",
+      "acceptedAnswer": {"@type": "Answer", "text": "نعم، يمكن تنفيذ الخدمة ضمن باقة متكاملة تشمل التوريد والزراعة والري والصيانة وتنسيق الحدائق."}
+    }
+  ]
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<section class="page-hero compact">
+    <div class="container page-hero-shell">
+        <div>
+            <span class="eyebrow">خدمة متخصصة في السعودية</span>
+            <h1>{{ service.name }}</h1>
+            <p>{{ service.description }}</p>
+            <div class="hero-actions">
+                <a class="btn btn-primary" href="{{ whatsapp_url }}" target="_blank" rel="noopener">اطلب عرض سعر</a>
+                <a class="btn btn-outline" href="tel:{{ contact_phone }}">اتصل الآن</a>
+            </div>
+        </div>
+        {% with hero_image=page_images|first %}
+            {% if hero_image %}
+            <figure class="page-hero-visual">
+                {% image_srcset hero_image.image_url as srcset %}
+                <img src="{{ hero_image.image_url }}" {% if srcset %}srcset="{{ srcset }}" sizes="(max-width: 720px) 100vw, 50vw"{% endif %} alt="{{ service.name }}" loading="eager">
+            </figure>
+            {% endif %}
+        {% endwith %}
+    </div>
+</section>
+
+<section class="section muted">
+    <div class="container">
+        <div class="cta-box conversion-cta">
+            <div>
+                <span class="eyebrow">قرار سريع</span>
+                <h2>تحتاج {{ service.name }}؟ أرسل موقعك وصور المكان الآن</h2>
+                <p>نراجع نوع الخدمة والمدينة والمساحة، ثم نرد عليك بخطوة واضحة: معاينة، سعر مبدئي، أو اقتراح النوع المناسب.</p>
+            </div>
+            <div class="hero-actions">
+                <a class="btn btn-primary" href="{{ whatsapp_url }}" target="_blank" rel="noopener">طلب عبر واتساب</a>
+                <a class="btn btn-outline" href="tel:{{ contact_phone }}">اتصال مباشر</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container two-col two-col-top">
+        <article class="content-card">
+            <span class="eyebrow">تفاصيل الخدمة</span>
+            <h2>{{ service.name }} للفلل والمزارع والاستراحات والمشاريع</h2>
+            <p>{{ service.description }}</p>
+            {% if service.benefits %}
+            <ul>
+                {% for benefit in service.benefits %}
+                <li>{{ benefit }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+        </article>
+
+        <article class="content-card accent-card">
+            <span class="eyebrow">استهداف محلي</span>
+            <h2>صفحات الخدمة حسب المدينة</h2>
+            <p>اختر المدينة للوصول إلى صفحة محلية مخصصة تساعد العميل ومحركات البحث على فهم توفر الخدمة في كل منطقة.</p>
+            <div class="service-links">
+                {% for city in cities %}
+                <a class="related-link" href="{{ city.url }}">{{ service.name }} في {{ city.name }}</a>
+                {% endfor %}
+            </div>
+        </article>
+    </div>
+</section>
+
+<section class="section muted">
+    <div class="container">
+        <div class="section-heading">
+            <span class="eyebrow">نطاق الخدمة</span>
+            <h2>كلمات واحتياجات مرتبطة يبحث عنها العملاء</h2>
+        </div>
+        <div class="process-grid">
+            <article class="process-card reveal">
+                <strong>نخيل</strong>
+                <h3>توريد وزراعة وصيانة النخيل</h3>
+                <p>توريد نخيل الرياض، تكريب نخيل، تشذيب نخيل، نخيل مثمر، نخيل واشنطني، نخيل عربي، نخيل ملوكي، نقل نخيل، ري وتسميد النخيل.</p>
+            </article>
+            <article class="process-card reveal">
+                <strong>لاندسكيب</strong>
+                <h3>تنسيق حدائق وثيل وأشجار</h3>
+                <p>تصميم حدائق، تنفيذ لاندسكيب، توريد أشجار ظل وزينة ومثمرة، تركيب ثيل طبيعي وصناعي، شبكات ري، تجهيز تربة وأحواض زراعة.</p>
+            </article>
+            <article class="process-card reveal">
+                <strong>خارجي</strong>
+                <h3>شبوك ومظلات وعناصر مكملة</h3>
+                <p>تنفيذ شبوك، مظلات، جلسات خارجية، ممرات، إضاءة حدائق، صيانة شهرية، مكافحة آفات، وتجديد الحدائق القديمة.</p>
+            </article>
+        </div>
+    </div>
+</section>
+
+{% include "partials/managed_gallery.html" with images=page_images %}
+{% endblock %}

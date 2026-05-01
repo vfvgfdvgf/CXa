@@ -1,0 +1,187 @@
+{% extends "base.html" %}
+{% load seo_images %}
+
+{% block extra_head %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Service",
+  "name": "{{ service.name|escapejs }} في {{ city.name|escapejs }}",
+  "description": "{{ seo.description|escapejs }}",
+  "provider": {
+    "@type": "LocalBusiness",
+    "name": "{{ site_name|escapejs }}",
+    "telephone": "{{ contact_phone|escapejs }}",
+    "url": "{{ request.scheme }}://{{ request.get_host }}/"
+  },
+  "areaServed": {
+    "@type": "City",
+    "name": "{{ city.name|escapejs }}"
+  },
+  "serviceType": "{{ service.name|escapejs }}",
+  "url": "{{ seo.canonical|escapejs }}"
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {"@type": "ListItem", "position": 1, "name": "الرئيسية", "item": "{{ request.scheme }}://{{ request.get_host }}/"},
+    {"@type": "ListItem", "position": 2, "name": "المدن", "item": "{{ request.scheme }}://{{ request.get_host }}{% url 'cities' %}"},
+    {"@type": "ListItem", "position": 3, "name": "{{ city.name|escapejs }}", "item": "{{ request.scheme }}://{{ request.get_host }}{% url 'city_detail' city.slug %}"},
+    {"@type": "ListItem", "position": 4, "name": "{{ service.name|escapejs }}", "item": "{{ seo.canonical|escapejs }}"}
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "هل تتوفر خدمة {{ service.name|escapejs }} في {{ city.name|escapejs }}؟",
+      "acceptedAnswer": {"@type": "Answer", "text": "نعم، نوفر الخدمة داخل {{ city.name|escapejs }} مع معاينة وتحديد احتياج الموقع قبل التنفيذ."}
+    },
+    {
+      "@type": "Question",
+      "name": "كيف أطلب عرض سعر؟",
+      "acceptedAnswer": {"@type": "Answer", "text": "يمكنك طلب عرض السعر عبر واتساب أو الاتصال المباشر وإرسال موقع المشروع وصور المكان."}
+    },
+    {
+      "@type": "Question",
+      "name": "هل يمكن تنفيذ أكثر من خدمة في نفس المشروع؟",
+      "acceptedAnswer": {"@type": "Answer", "text": "نعم، يمكن دمج أكثر من خدمة مثل اللاندسكيب والنخيل والري حسب مساحة المشروع وميزانيته."}
+    }
+  ]
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<section class="page-hero">
+    <div class="container page-hero-shell city-hero-shell">
+        <div>
+            <span class="eyebrow">خدمة محلية في {{ city.name }}</span>
+            <h1>{{ service.keyword|default:service.name }} في {{ city.name }}</h1>
+            <p>{{ service.description }}</p>
+            <div class="hero-actions">
+                <a class="btn btn-primary" href="{{ whatsapp_url }}?text={{ quote_message }}" target="_blank" rel="noopener">اطلب عرض سعر</a>
+                <a class="btn btn-outline" href="tel:{{ contact_phone }}">اتصل الآن</a>
+            </div>
+        </div>
+        {% with hero_image=page_images|first %}
+            {% if hero_image %}
+            <figure class="page-hero-visual">
+                {% image_srcset hero_image.image_url as srcset %}
+
+                <img src="{{ hero_image.image_url }}" {% if srcset %}srcset="{{ srcset }}" sizes="(max-width: 720px) 100vw, 50vw"{% endif %} alt="{{ hero_image.display_alt }}" loading="eager">
+            </figure>
+            {% else %}
+            <div class="page-hero-note city-note">
+                <strong>{{ service.name }} في {{ city.name }}</strong>
+                <span>صفحة خدمة محلية مخصصة لشرح نطاق العمل والربط مع خدمات قريبة داخل المدينة.</span>
+            </div>
+            {% endif %}
+        {% endwith %}
+    </div>
+</section>
+
+<section class="section muted">
+    <div class="container">
+        <div class="cta-box conversion-cta">
+            <div>
+                <span class="eyebrow">عرض أسرع</span>
+                <h2>أرسل صور موقعك في {{ city.name }} وسنقترح الحل المناسب</h2>
+                <p>الصور والمدينة ونوع الخدمة تساعدنا نعطيك تصور أسرع للتكلفة والخطوات المطلوبة.</p>
+            </div>
+            <div class="hero-actions">
+                <a class="btn btn-primary" href="{{ whatsapp_url }}?text={{ quote_message }}" target="_blank" rel="noopener">إرسال عبر واتساب</a>
+                <a class="btn btn-outline" href="tel:{{ contact_phone }}">اتصال مباشر</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container two-col two-col-top">
+        <article class="content-card">
+            <span class="eyebrow">تفاصيل الخدمة</span>
+            <h2>ما الذي يشمله تنفيذ {{ service.name }} في {{ city.name }}؟</h2>
+            <p>{{ service.description }}</p>
+            {% if service.benefits %}
+            <ul>
+                {% for benefit in service.benefits %}
+                <li>{{ benefit }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+        </article>
+
+        <article class="content-card accent-card">
+            <span class="eyebrow">طلب سريع</span>
+            <h2>جهز تفاصيل مشروعك</h2>
+            <p>أرسل موقع المشروع داخل {{ city.name }} وصور المكان والمساحة التقريبية، وسنقترح لك الحل المناسب للخدمة والميزانية.</p>
+            <div class="service-links">
+                <a class="btn btn-primary" href="{{ whatsapp_url }}?text={{ quote_message }}" target="_blank" rel="noopener">واتساب</a>
+                <a class="btn btn-outline" href="{% url 'contact' %}">نموذج التواصل</a>
+            </div>
+        </article>
+    </div>
+</section>
+
+<section class="section muted">
+    <div class="container">
+        <div class="section-heading">
+            <span class="eyebrow">طريقة العمل</span>
+            <h2>خطوات تنفيذ {{ service.name }} داخل {{ city.name }}</h2>
+        </div>
+        <div class="process-grid">
+            <article class="process-card reveal">
+                <strong>1</strong>
+                <h3>معاينة وفهم الاحتياج</h3>
+                <p>نراجع موقع المشروع ونحدد المتطلبات الفنية والخيارات المناسبة للمساحة وطبيعة الاستخدام.</p>
+            </article>
+            <article class="process-card reveal">
+                <strong>2</strong>
+                <h3>تسعير واضح</h3>
+                <p>نجهز عرضًا مختصرًا يوضح نطاق العمل والمواد والمدة المتوقعة قبل بدء التنفيذ.</p>
+            </article>
+            <article class="process-card reveal">
+                <strong>3</strong>
+                <h3>تنفيذ وتسليم</h3>
+                <p>ننفذ الخدمة بترتيب واضح مع متابعة الجودة حتى تسليم النتيجة النهائية.</p>
+            </article>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container two-col two-col-top">
+        <article class="content-card">
+            <span class="eyebrow">روابط داخلية</span>
+            <h2>خدمات قريبة في {{ city.name }}</h2>
+            <p>هذه الروابط تساعد الزائر ومحركات البحث على فهم الخدمات المرتبطة داخل نفس المدينة.</p>
+            {% for related in related_services %}
+            <a class="related-link" href="{{ related.url }}">{{ related.name }} في {{ city.name }}</a>
+            {% empty %}
+            <p>سيتم عرض خدمات مرتبطة هنا عند إضافة خدمات أخرى لهذه المدينة.</p>
+            {% endfor %}
+        </article>
+
+        <article class="content-card accent-card">
+            <span class="eyebrow">أسئلة شائعة</span>
+            <h2>أسئلة عن {{ service.name }} في {{ city.name }}</h2>
+            <h3>هل تتوفر الخدمة في جميع أحياء {{ city.name }}؟</h3>
+            <p>نعم، يتم تأكيد التغطية حسب موقع المشروع وجدول التنفيذ.</p>
+            <h3>هل يمكن الجمع بين أكثر من خدمة؟</h3>
+            <p>نعم، يمكن تنفيذ باقة متكاملة تشمل التصميم والزراعة والري والصيانة حسب الحاجة.</p>
+            <h3>ما أسرع طريقة للحصول على سعر؟</h3>
+            <p>إرسال الموقع والصور عبر واتساب يساعدنا على إعطاء تصور أسرع وأدق.</p>
+        </article>
+    </div>
+</section>
+
+{% include "partials/managed_gallery.html" with images=page_images %}
+{% endblock %}

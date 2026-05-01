@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% load seo_images %}
+
+{% block content %}
+<section class="page-hero compact">
+    <div class="container page-hero-shell">
+        <div>
+            <span class="eyebrow">الأعمال</span>
+            <h1>مشاريع مختارة تعكس الجودة والدقة وسرعة التنفيذ</h1>
+            <p>الصفحة تعرض المشاريع بشكل أكثر ترتيبًا وثراءً بصريًا، مع صور كثيرة تدعم الثقة وتوضح نتيجة التنفيذ النهائي.</p>
+        </div>
+        {% with hero_image=page_images|first %}
+            {% if hero_image %}
+            <figure class="page-hero-visual">
+                {% image_srcset hero_image.image_url as srcset %}
+
+                <img src="{{ hero_image.image_url }}" {% if srcset %}srcset="{{ srcset }}" sizes="(max-width: 720px) 100vw, 50vw"{% endif %} alt="{{ hero_image.display_alt }}" loading="lazy">
+            </figure>
+            {% endif %}
+        {% endwith %}
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <div class="featured-projects">
+            {% for item in portfolio_items %}
+            <article class="featured-project-card reveal {% if forloop.first %}featured-project-card-main{% endif %}">
+                {% image_srcset item.image_url as srcset %}
+
+                <img src="{{ item.image_url }}" {% if srcset %}srcset="{{ srcset }}" sizes="(max-width: 720px) 100vw, 50vw"{% endif %} alt="{{ item.title }}" loading="lazy">
+                <div class="featured-project-copy">
+                    <span>{{ item.category }}</span>
+                    <h2>{{ item.title }}</h2>
+                    <p>{{ item.description|default:"تنفيذ نهائي يراعي جودة الخامة، ثبات التركيب، والهوية البصرية المناسبة للموقع." }}</p>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+{% include "partials/managed_gallery.html" with images=page_images %}
+{% endblock %}

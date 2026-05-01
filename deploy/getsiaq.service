@@ -1,0 +1,15 @@
+[Unit]
+Description=getsiaq.online Django Gunicorn service
+After=network.target
+
+[Service]
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/getsiaq
+EnvironmentFile=/var/www/getsiaq/.env
+ExecStart=/var/www/getsiaq/.venv/bin/gunicorn project.wsgi:application --workers 3 --bind unix:/run/getsiaq.sock --log-file -
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

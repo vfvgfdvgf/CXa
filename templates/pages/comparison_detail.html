@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% load seo_images %}
+
+{% block content %}
+<section class="page-hero compact">
+    <div class="container page-hero-shell">
+        <div>
+            <span class="eyebrow">مقارنة تساعدك تختار</span>
+            <h1>{{ comparison.title }}</h1>
+            <p>{{ comparison.description }}</p>
+            <div class="hero-actions">
+                <a class="btn btn-primary" href="{{ whatsapp_url }}" target="_blank" rel="noopener">اسألنا عن الأنسب</a>
+                <a class="btn btn-outline" href="{% url 'cost_calculator' %}">احسب تكلفة تقريبية</a>
+            </div>
+        </div>
+        {% with hero_image=page_images|first %}
+            {% if hero_image %}
+            <figure class="page-hero-visual">
+                {% image_srcset hero_image.image_url as srcset %}
+                <img src="{{ hero_image.image_url }}" {% if srcset %}srcset="{{ srcset }}" sizes="(max-width: 720px) 100vw, 50vw"{% endif %} alt="{{ comparison.title }}" loading="eager">
+            </figure>
+            {% endif %}
+        {% endwith %}
+    </div>
+</section>
+
+<section class="section">
+    <div class="container comparison-grid">
+        <article class="content-card">
+            <span class="eyebrow">الخيار الأول</span>
+            <h2>{{ comparison.left }}</h2>
+            <ul>
+                {% for item in comparison.left_points %}
+                <li>{{ item }}</li>
+                {% endfor %}
+            </ul>
+        </article>
+        <article class="content-card accent-card">
+            <span class="eyebrow">الخيار الثاني</span>
+            <h2>{{ comparison.right }}</h2>
+            <ul>
+                {% for item in comparison.right_points %}
+                <li>{{ item }}</li>
+                {% endfor %}
+            </ul>
+        </article>
+    </div>
+</section>
+
+<section class="section muted">
+    <div class="container">
+        <div class="cta-box conversion-cta">
+            <div>
+                <span class="eyebrow">الخلاصة</span>
+                <h2>متى تختار كل خيار؟</h2>
+                <p>{{ comparison.recommendation }}</p>
+            </div>
+            <div class="hero-actions">
+                <a class="btn btn-primary" href="{{ whatsapp_url }}" target="_blank" rel="noopener">أرسل صور الموقع</a>
+                <a class="btn btn-outline" href="{% url 'contact' %}">نموذج التواصل</a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

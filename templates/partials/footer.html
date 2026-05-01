@@ -1,0 +1,63 @@
+<footer class="site-footer">
+    <div class="container footer-shell">
+        <div class="footer-top">
+            <div class="footer-brand">
+                <span class="brand-mark footer-mark">م</span>
+                <div>
+                    <h2>{{ site_name }}</h2>
+                    <p>{{ site_settings_obj.footer_text|default:site_tagline }}</p>
+                </div>
+            </div>
+            <div class="footer-primary-action">
+                <a class="btn btn-primary" href="{{ whatsapp_url }}" target="_blank" rel="noopener">اطلب عرض سعر</a>
+            </div>
+        </div>
+        <div class="footer-grid">
+            <div>
+                <h3>عن الموقع</h3>
+                <p>{{ site_tagline }}</p>
+                {% if site_settings_obj.address %}
+                <p>{{ site_settings_obj.address }}</p>
+                {% endif %}
+            </div>
+            <div>
+                <h3>التصفح</h3>
+                <a href="{% url 'about' %}">من نحن</a>
+                <a href="{% url 'services' %}">الخدمات</a>
+                <a href="{% url 'cost_calculator' %}">حاسبة التكلفة</a>
+                <a href="{% url 'cost_calculator_detail' 'palm-supply' %}">حاسبة توريد النخيل</a>
+                <a href="{% url 'cost_calculator_detail' 'palm-pruning' %}">حاسبة تكريب النخيل</a>
+                <a href="{% url 'cost_calculator_detail' 'artificial-grass' %}">حاسبة العشب الصناعي</a>
+                <a href="{% url 'comparison_detail' 'washingtonia-vs-royal-palm' %}">واشنطني أم ملوكي</a>
+                <a href="{% url 'comparison_detail' 'natural-vs-artificial-grass' %}">ثيل أم عشب صناعي</a>
+                <a href="{% url 'portfolio' %}">الأعمال</a>
+                <a href="{% url 'blog' %}">المدونة</a>
+                <a href="{% url 'archive_network' %}">شبكة الأرشفة</a>
+                <a href="{% url 'archive_services' %}">فهرس الخدمات</a>
+                <a href="{% url 'archive_cities' %}">فهرس المدن</a>
+                <a href="{% url 'archive_articles' %}">فهرس المقالات</a>
+            </div>
+            <div>
+                <h3>التواصل</h3>
+                {% for item in contact_numbers %}
+                <a href="tel:{{ item.phone }}">{{ item.label }}: {{ item.phone }}</a>
+                {% endfor %}
+                <a href="{{ whatsapp_url }}" target="_blank" rel="noopener">واتساب</a>
+                {% if site_settings_obj.email %}
+                <a href="mailto:{{ site_settings_obj.email }}">{{ site_settings_obj.email }}</a>
+                {% endif %}
+            </div>
+            <div>
+                <h3>الحسابات</h3>
+                {% if site_settings_obj.instagram_url %}<a href="{{ site_settings_obj.instagram_url }}" target="_blank" rel="noopener">Instagram</a>{% endif %}
+                {% if site_settings_obj.facebook_url %}<a href="{{ site_settings_obj.facebook_url }}" target="_blank" rel="noopener">Facebook</a>{% endif %}
+                {% if site_settings_obj.x_url %}<a href="{{ site_settings_obj.x_url }}" target="_blank" rel="noopener">X</a>{% endif %}
+                {% if site_settings_obj.linkedin_url %}<a href="{{ site_settings_obj.linkedin_url }}" target="_blank" rel="noopener">LinkedIn</a>{% endif %}
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <span>جميع الحقوق محفوظة © {{ site_name }}</span>
+            <span><a href="https://getsiaq.com/developer/" target="_blank" rel="noopener">تصميم وتطوير ياسر المستنيري</a></span>
+        </div>
+    </div>
+</footer>

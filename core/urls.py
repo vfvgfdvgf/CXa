@@ -1,0 +1,39 @@
+from django.urls import path
+
+from . import views
+
+
+urlpatterns = [
+    path("", views.home, name="home"),
+    path("pages/<slug:page_slug>/", views.managed_page, name="managed_page"),
+    path("about/", views.about, name="about"),
+    path("services/", views.services, name="services"),
+    path("services/<slug:service_slug>/", views.service_detail, name="service_detail"),
+    path("projects/", views.portfolio, name="portfolio"),
+    path("cities/", views.cities, name="cities"),
+    path("blog/", views.blog_index, name="blog"),
+    path("blog/category/<slug:category_slug>/", views.blog_category, name="blog_category"),
+    path("blog/tag/<slug:tag_slug>/", views.blog_tag, name="blog_tag"),
+    path("blog/<slug:post_slug>/", views.blog_detail, name="blog_detail"),
+    path("blog/<slug:post_slug>/track-read/", views.blog_track_read, name="blog_track_read"),
+    path("lead/capture/", views.capture_lead, name="capture_lead"),
+    path("conversion/track/", views.track_conversion, name="track_conversion"),
+    path("contact/", views.contact, name="contact"),
+    path("cost-calculator/", views.cost_calculator, name="cost_calculator"),
+    path("cost-calculator/<slug:calculator_slug>/", views.cost_calculator_detail, name="cost_calculator_detail"),
+    path("compare/<slug:comparison_slug>/", views.comparison_detail, name="comparison_detail"),
+    path("archive/", views.archive_network, name="archive_network"),
+    path("archive/services/", views.archive_services, name="archive_services"),
+    path("archive/cities/", views.archive_cities, name="archive_cities"),
+    path("archive/articles/", views.archive_articles, name="archive_articles"),
+    path("robots.txt", views.robots_txt, name="robots_txt"),
+    path("sitemap.xml", views.sitemap_xml, name="sitemap_xml"),
+    path("sitemap-pages.xml", views.sitemap_pages_xml, name="sitemap_pages_xml"),
+    path("sitemap-services.xml", views.sitemap_services_xml, name="sitemap_services_xml"),
+    path("sitemap-cities.xml", views.sitemap_cities_xml, name="sitemap_cities_xml"),
+    path("sitemap-local-services.xml", views.sitemap_local_services_xml, name="sitemap_local_services_xml"),
+    path("sitemap-blog.xml", views.sitemap_blog_xml, name="sitemap_blog_xml"),
+    path("sitemap-images.xml", views.sitemap_images_xml, name="sitemap_images_xml"),
+    path("<slug:city_slug>/", views.city_detail, name="city_detail"),
+    path("<slug:city_slug>/<slug:service_slug>/", views.city_service_detail, name="city_service_detail"),
+]

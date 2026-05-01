@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% load seo_images %}
+
+{% block content %}
+<section class="page-hero compact">
+    <div class="container page-hero-shell">
+        <div>
+            <span class="eyebrow">من نحن</span>
+            <h1>خبرة سعودية في اللاندسكيب وتصميم الحدائق</h1>
+            <p>نعمل على تنفيذ مشاريع عالية الجودة في جميع مدن المملكة، مع تركيز على المتانة، المظهر، وسرعة الإنجاز من أول معاينة حتى التسليم.</p>
+        </div>
+        {% with hero_image=page_images|first %}
+            {% if hero_image %}
+            <figure class="page-hero-visual">
+                {% image_srcset hero_image.image_url as srcset %}
+
+                <img src="{{ hero_image.image_url }}" {% if srcset %}srcset="{{ srcset }}" sizes="(max-width: 720px) 100vw, 50vw"{% endif %} alt="{{ hero_image.display_alt }}" loading="lazy">
+            </figure>
+            {% else %}
+            <div class="page-hero-note">
+                <strong>تنفيذ يركز على الثقة</strong>
+                <span>نوازن بين الهوية البصرية، جودة المواد، وسرعة الوصول لنتيجة عملية وأنيقة.</span>
+            </div>
+            {% endif %}
+        {% endwith %}
+    </div>
+</section>
+
+<section class="section">
+    <div class="container two-col">
+        <article class="content-card">
+            <h2>رؤيتنا</h2>
+            <p>أن نكون الخيار الأول عند البحث عن اللاندسكيب وتنسيق الحدائق وزراعة الأشجار والنخيل داخل السعودية، مع حضور قوي في البحث المحلي وتجربة عميل واضحة وسريعة.</p>
+            <h2>ما الذي يميزنا</h2>
+            <ul>
+                <li>حلول متكاملة من المعاينة إلى التنفيذ.</li>
+                <li>تصاميم مخصصة للمنازل والفلل والحدائق والمزارع.</li>
+                <li>اهتمام فعلي بالتفاصيل الجمالية والإنشائية.</li>
+            </ul>
+        </article>
+        <article class="content-card accent-card">
+            <h2>قيم العمل</h2>
+            <p>الجودة، الصدق، السرعة، والالتزام في كل مرحلة. نهتم بأن يكون العميل مطلعًا على الخامات والمقاسات وخيارات التنفيذ قبل بدء المشروع.</p>
+            <a class="btn btn-primary" href="{% url 'contact' %}">تواصل معنا</a>
+        </article>
+    </div>
+</section>
+{% include "partials/managed_gallery.html" with images=page_images %}
+{% endblock %}

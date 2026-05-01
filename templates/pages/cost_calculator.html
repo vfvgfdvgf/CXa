@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% load seo_images %}
+
+{% block content %}
+<section class="page-hero compact">
+    <div class="container page-hero-shell">
+        <div>
+            <span class="eyebrow">تقدير سريع قبل المعاينة</span>
+            <h1>{{ calculator.title }}</h1>
+            <p>{{ calculator.description }} اختر الكمية أو المساحة وبعض التفاصيل لتحصل على نطاق تقديري، ثم أرسل الطلب عبر واتساب للحصول على عرض أدق.</p>
+        </div>
+        {% with hero_image=page_images|first %}
+            {% if hero_image %}
+            <figure class="page-hero-visual">
+                {% image_srcset hero_image.image_url as srcset %}
+                <img src="{{ hero_image.image_url }}" {% if srcset %}srcset="{{ srcset }}" sizes="(max-width: 720px) 100vw, 50vw"{% endif %} alt="حاسبة تكلفة اللاندسكيب" loading="eager">
+            </figure>
+            {% endif %}
+        {% endwith %}
+    </div>
+</section>
+
+<section class="section">
+    <div class="container two-col two-col-top">
+        <form class="quote-form calculator-card" data-cost-calculator data-whatsapp="{{ whatsapp_url }}" data-lead-url="{% url 'capture_lead' %}" data-track-url="{% url 'track_conversion' %}" data-min-rate="{{ calculator.min_rate }}" data-max-rate="{{ calculator.max_rate }}" data-default-service="{{ calculator.service }}">
+            <label>
+                نوع الخدمة
+                <select name="service" data-calc-service>
+                    <option value="{{ calculator_slug }}" selected>{{ calculator.service }}</option>
+                </select>
+            </label>
+            <label>
+                الكمية أو المساحة التقريبية: {{ calculator.unit }}
+                <input type="number" name="area" min="1" step="1" value="100" data-calc-area>
+            </label>
+            <label>
+                مستوى التنفيذ
+                <select name="level" data-calc-level>
+                    <option value="basic">اقتصادي</option>
+                    <option value="standard" selected>متوسط</option>
+                    <option value="premium">فاخر</option>
+                </select>
+            </label>
+            <label>
+                المدينة
+                <input type="text" name="city" placeholder="مثال: الرياض">
+            </label>
+            <label>
+                رقم التواصل
+                <input type="tel" name="phone" placeholder="05xxxxxxxx">
+            </label>
+            <label>
+                تفاصيل إضافية
+                <textarea name="details" rows="4" placeholder="مثال: المقاس المطلوب أو صور الموقع أو تفاصيل التنفيذ"></textarea>
+            </label>
+            <button class="btn btn-primary" type="submit">أرسل التقدير عبر واتساب</button>
+        </form>
+
+        <aside class="content-card calculator-result" data-calc-result>
+            <span class="eyebrow">النطاق التقريبي</span>
+            <h2><span data-calc-min>0</span> - <span data-calc-max>0</span> ريال</h2>
+            <p>التقدير تقريبي ويتغير حسب نوع المواد، تجهيز التربة، الري، المقاسات، وسهولة الوصول للموقع.</p>
+            <ul>
+                {% for tip in calculator.tips %}
+                <li>{{ tip }}</li>
+                {% endfor %}
+            </ul>
+        </aside>
+    </div>
+</section>
+
+<section class="section muted">
+    <div class="container">
+        <div class="section-heading split-heading">
+            <div>
+                <span class="eyebrow">حاسبات أخرى</span>
+                <h2>اختر حاسبة أكثر دقة حسب الخدمة</h2>
+            </div>
+            <p>كل حاسبة لها صفحة مستقلة تساعد الزائر ومحركات البحث على فهم الخدمة والتكلفة التقريبية.</p>
+        </div>
+        <div class="archive-link-grid dense">
+            {% for item in calculators %}
+            <a href="{% url 'cost_calculator_detail' item.slug %}">
+                <span>{{ item.unit }}</span>
+                <strong>{{ item.title }}</strong>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,49 @@
+<header class="site-header" id="top">
+    <div class="header-strip">
+        <div class="container header-strip-inner">
+            <p>خدماتنا: {% for item in service_highlights|slice:":4" %}{{ item }}{% if not forloop.last %} • {% endif %}{% endfor %}</p>
+            <div class="header-strip-links">
+                {% for item in contact_numbers|slice:":2" %}
+                <a href="tel:{{ item.phone }}">{{ item.label }}: {{ item.phone }}</a>
+                {% endfor %}
+                <a href="{{ whatsapp_url }}" target="_blank" rel="noopener">واتساب سريع</a>
+            </div>
+        </div>
+    </div>
+    <div class="container topbar">
+        <a class="brand" href="{% url 'home' %}">
+            <span>
+                <strong>{{ site_name }}</strong>
+                <small>{{ site_tagline }}</small>
+            </span>
+        </a>
+        <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-menu" aria-label="فتح القائمة">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+        <div class="header-panel" id="site-menu">
+            <div class="header-main">
+            <nav class="main-nav" aria-label="Main navigation">
+                {% if nav_items %}
+                    {% for item in nav_items %}
+                    <a href="{{ item.url }}"{% if item.new_tab %} target="_blank" rel="noopener"{% endif %}>{{ item.label }}</a>
+                    {% endfor %}
+                {% else %}
+                    <a href="{% url 'home' %}">{{ ui.home }}</a>
+                    <a href="{% url 'about' %}">{{ ui.about }}</a>
+                    <a href="{% url 'services' %}">{{ ui.services }}</a>
+                    <a href="{% url 'portfolio' %}">{{ ui.projects }}</a>
+                    <a href="{% url 'cities' %}">{{ ui.cities }}</a>
+                    <a href="{% url 'blog' %}">{{ ui.blog }}</a>
+                    <a href="{% url 'contact' %}">{{ ui.contact }}</a>
+                {% endif %}
+            </nav>
+            </div>
+            <div class="header-actions">
+                <span class="header-response-note">رد سريع ومعاينة حسب المدينة</span>
+                <a class="btn btn-primary" href="{{ whatsapp_url }}" target="_blank" rel="noopener">{{ ui.quote }}</a>
+            </div>
+        </div>
+    </div>
+</header>

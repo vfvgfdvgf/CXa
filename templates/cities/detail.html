@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+{% load seo_images %}
+
+{% block extra_head %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "name": "خدمات {{ city.name|escapejs }}",
+  "description": "{{ seo.description|escapejs }}",
+  "url": "{{ seo.canonical|escapejs }}",
+  "about": {
+    "@type": "City",
+    "name": "{{ city.name|escapejs }}"
+  },
+  "publisher": {
+    "@type": "LocalBusiness",
+    "name": "{{ site_name|escapejs }}",
+    "telephone": "{{ contact_phone|escapejs }}"
+  }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {"@type": "ListItem", "position": 1, "name": "الرئيسية", "item": "{{ request.scheme }}://{{ request.get_host }}/"},
+    {"@type": "ListItem", "position": 2, "name": "المدن", "item": "{{ request.scheme }}://{{ request.get_host }}{% url 'cities' %}"},
+    {"@type": "ListItem", "position": 3, "name": "{{ city.name|escapejs }}", "item": "{{ seo.canonical|escapejs }}"}
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "ما الخدمات المتوفرة في {{ city.name|escapejs }}؟",
+      "acceptedAnswer": {"@type": "Answer", "text": "نوفر خدمات اللاندسكيب وتنسيق الحدائق وزراعة النخيل والري والخدمات المرتبطة حسب احتياج المشروع."}
+    },
+    {
+      "@type": "Question",
+      "name": "هل يمكن طلب أكثر من خدمة في نفس المدينة؟",
+      "acceptedAnswer": {"@type": "Answer", "text": "نعم، يمكن طلب خدمة واحدة أو عدة خدمات في أمر واحد، ويتم تجهيز تصور مناسب للمشروع."}
+    },
+    {
+      "@type": "Question",
+      "name": "كيف تساعد هذه الصفحة في البحث المحلي؟",
+      "acceptedAnswer": {"@type": "Answer", "text": "تجمع الصفحة روابط الخدمات الخاصة بالمدينة وتوضح نطاق الخدمة لمحركات البحث والزائر."}
+    }
+  ]
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<section class="page-hero">
+    <div class="container page-hero-shell city-hero-shell">
+        <div>
+            <span class="eyebrow">خدماتنا في {{ city.name }}</span>
+            <h1>لاندسكيب وتنسيق حدائق وأشجار ونخيل في {{ city.name }}</h1>
+            <p>{{ city.description }} نقدم حلولًا متكاملة للمشاريع السكنية والتجارية والزراعية مع تركيز على سرعة الوصول وجودة الخامات والالتزام في التنفيذ.</p>
+            <div class="hero-actions">
+                <a class="btn btn-primary" href="{{ whatsapp_url }}?text={{ quote_message }}" target="_blank" rel="noopener">اطلب عرض سعر</a>
+                <a class="btn btn-outline" href="tel:{{ contact_phone }}">اتصل الآن</a>
+            </div>
+        </div>
+        {% with hero_image=page_images|first %}
+            {% if hero_image %}
+            <figure class="page-hero-visual">
+                {% image_srcset hero_image.image_url as srcset %}
+
+                <img src="{{ hero_image.image_url }}" {% if srcset %}srcset="{{ srcset }}" sizes="(max-width: 720px) 100vw, 50vw"{% endif %} alt="{{ hero_image.display_alt }}" loading="eager">
+            </figure>
+            {% else %}
+            <div class="page-hero-note city-note">
+                <strong>{{ city.name }}</strong>
+                <span>صفحة محلية تجمع أهم خدمات المدينة وتربطها بصفحات تفصيلية لكل خدمة.</span>
+            </div>
+            {% endif %}
+        {% endwith %}
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <div class="section-heading">
+            <span class="eyebrow">روابط الخدمات</span>
+            <h2>خدمات مخصصة داخل {{ city.name }}</h2>
+            <p>صفحة محلية محسنة للبحث تضم الخدمات الأكثر طلبًا وروابط داخلية تساعد الزائر ومحركات البحث على فهم التغطية داخل المدينة.</p>
+        </div>
+        <div class="cards-grid">
+            {% for item in service_links %}
+            <article class="service-card reveal">
+                {% if item.image %}
+                {% image_srcset item.image as srcset %}
+
+                <img src="{{ item.image }}" {% if srcset %}srcset="{{ srcset }}" sizes="(max-width: 720px) 100vw, 50vw"{% endif %} alt="{{ item.name }} في {{ city.name }}" loading="lazy">
+                {% endif %}
+                <h3>{{ item.name }} في {{ city.name }}</h3>
+                <p>{{ item.description }}</p>
+                <div class="service-links">
+                    <a class="btn btn-primary" href="{{ item.url }}">عرض الخدمة</a>
+                    <a class="btn btn-outline" href="{{ whatsapp_url }}?text={{ quote_message }}" target="_blank" rel="noopener">واتساب</a>
+                </div>
+            </article>
+            {% empty %}
+            <article class="content-card">
+                <h3>لا توجد خدمات منشورة حاليًا</h3>
+                <p>يمكن إضافة خدمات المدينة من لوحة التحكم أو من مولد الذكاء الاصطناعي.</p>
+            </article>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<section class="section muted">
+    <div class="container process-grid">
+        <article class="process-card reveal">
+            <strong>1</strong>
+            <h3>تحديد الاحتياج</h3>
+            <p>نراجع نوع الخدمة داخل {{ city.name }} ونحدد الخامة والتصميم المناسبين حسب الموقع.</p>
+        </article>
+        <article class="process-card reveal">
+            <strong>2</strong>
+            <h3>المعاينة والتسعير</h3>
+            <p>نقدم تصورًا واضحًا للمشروع مع عرض سعر سريع وروابط مباشرة للتواصل.</p>
+        </article>
+        <article class="process-card reveal">
+            <strong>3</strong>
+            <h3>التنفيذ والتسليم</h3>
+            <p>ننفذ بترتيب واضح مع تشطيب يرفع الثقة ويعكس جودة النتيجة النهائية.</p>
+        </article>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container two-col two-col-top">
+        <article class="content-card">
+            <span class="eyebrow">SEO محلي</span>
+            <h2>لماذا هذه الصفحة مهمة لظهور {{ city.name }}؟</h2>
+            <p>تجمع الصفحة خدمات {{ city.name }} في مكان واحد، ثم تربط كل خدمة بصفحة تفصيلية. هذا يحسن تجربة الزائر ويقوي الربط الداخلي حول المدينة والخدمات.</p>
+            <ul>
+                <li>ربط داخلي مباشر بين المدينة والخدمات.</li>
+                <li>استهداف كلمات بحث محلية مرتبطة بالمدينة.</li>
+                <li>أزرار واضحة للتحويل عبر الاتصال والواتساب.</li>
+            </ul>
+        </article>
+        <article class="content-card accent-card">
+            <span class="eyebrow">أسئلة شائعة</span>
+            <h2>أسئلة شائعة في {{ city.name }}</h2>
+            <h3>هل تتوفر المعاينة؟</h3>
+            <p>نعم، حسب نوع المشروع وموقعه داخل المدينة.</p>
+            <h3>هل يمكن طلب السعر عبر واتساب؟</h3>
+            <p>نعم، واتساب هو أسرع طريقة لإرسال الصور والموقع وطلب عرض السعر.</p>
+            <h3>هل تشمل الخدمة الأحياء والمخططات؟</h3>
+            <p>نغطي الأحياء والمخططات حسب جدول التنفيذ ونوع الخدمة المطلوبة.</p>
+        </article>
+    </div>
+</section>
+
+{% include "partials/managed_gallery.html" with images=page_images %}
+{% endblock %}

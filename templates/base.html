@@ -1,0 +1,120 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="{{ lang_code|default:'ar' }}" dir="{% if is_rtl %}rtl{% else %}ltr{% endif %}">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    {% for verification in site_verifications %}
+        {% if verification.raw_html %}
+            {{ verification.raw_html|safe }}
+        {% elif verification.name and verification.content %}
+            <meta name="{{ verification.name }}" content="{{ verification.content }}">
+        {% endif %}
+    {% endfor %}
+    <title>{{ seo.title }}</title>
+    <meta name="description" content="{{ seo.description|default:seo_default_description }}">
+    <meta name="author" content="{{ site_name }}">
+    <meta name="keywords" content="{{ seo.keywords|default:seo_default_keywords|default:'لاندسكيب, تصميم حدائق, تنسيق حدائق, أشجار, نخيل, شبوك, مظلات, السعودية' }}">
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <meta name="format-detection" content="telephone=no">
+    <link rel="canonical" href="{{ seo.canonical }}">
+    <link rel="alternate" hreflang="ar-SA" href="{{ seo.canonical }}">
+    <link rel="alternate" hreflang="x-default" href="{{ seo.canonical }}">
+    <link rel="sitemap" type="application/xml" href="{% url 'sitemap_xml' %}">
+    <link rel="contents" href="{% url 'archive_network' %}">
+    <link rel="icon" type="image/svg+xml" href="{% static 'images/favicon.svg' %}">
+    <meta property="og:title" content="{{ seo.title }}">
+    <meta property="og:site_name" content="{{ site_name }}">
+    <meta property="og:description" content="{{ seo.description|default:seo_default_description }}">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ seo.canonical }}">
+    <meta property="og:locale" content="ar_SA">
+    <meta property="og:image" content="{{ seo.image|default:seo_default_og_image }}">
+    <meta property="og:image:alt" content="{{ site_name }}">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ seo.title }}">
+    <meta name="twitter:description" content="{{ seo.description|default:seo_default_description }}">
+    <meta name="twitter:url" content="{{ seo.canonical }}">
+    <meta name="twitter:image" content="{{ seo.image|default:seo_default_og_image }}">
+    {% if seo_twitter_handle %}<meta name="twitter:site" content="{{ seo_twitter_handle }}">{% endif %}
+    <meta name="theme-color" content="{{ site_settings_obj.primary_color|default:'#83643b' }}">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <script defer src="{% static 'js/site.js' %}"></script>
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "{{ site_name|escapejs }}",
+      "legalName": "{{ site_settings_obj.legal_name|default:site_name|escapejs }}",
+      "url": "{{ site_url|default:seo.canonical|escapejs }}",
+      "telephone": "{{ contact_phone|escapejs }}",
+      "sameAs": [{% for link in site_settings_obj.same_as_list %}"{{ link|escapejs }}"{% if not forloop.last %},{% endif %}{% endfor %}]
+    }
+    </script>
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "{{ site_settings_obj.business_type|default:'LocalBusiness'|escapejs }}",
+      "name": "{{ site_name|escapejs }}",
+      "description": "{{ seo.description|default:seo_default_description|escapejs }}",
+      "url": "{{ site_url|default:seo.canonical|escapejs }}",
+      "telephone": "{{ contact_phone|escapejs }}",
+      "image": "{{ seo.image|default:seo_default_og_image|escapejs }}",
+      "sameAs": [{% for link in site_settings_obj.same_as_list %}"{{ link|escapejs }}"{% if not forloop.last %},{% endif %}{% endfor %}],
+      "contactPoint": [
+        {% for item in contact_numbers %}
+        {"@type": "ContactPoint", "telephone": "{{ item.phone|escapejs }}", "contactType": "customer service"}{% if not forloop.last %},{% endif %}
+        {% endfor %}
+      ],
+      "areaServed": [{% for area in site_settings_obj.area_served_list %}"{{ area|escapejs }}"{% if not forloop.last %},{% endif %}{% empty %}"SA"{% endfor %}]
+      {% if site_settings_obj.street_address or site_settings_obj.address %},
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "{{ site_settings_obj.street_address|default:site_settings_obj.address|escapejs }}",
+        "addressLocality": "{{ site_settings_obj.address_locality|escapejs }}",
+        "addressRegion": "{{ site_settings_obj.address_region|escapejs }}",
+        "postalCode": "{{ site_settings_obj.postal_code|escapejs }}",
+        "addressCountry": "{{ site_settings_obj.address_country|default:'SA'|escapejs }}"
+      }{% endif %}
+      {% if site_settings_obj.latitude and site_settings_obj.longitude %},
+      "geo": {"@type": "GeoCoordinates", "latitude": "{{ site_settings_obj.latitude }}", "longitude": "{{ site_settings_obj.longitude }}"}{% endif %}
+      {% if site_settings_obj.opening_hours_list %},
+      "openingHours": [{% for item in site_settings_obj.opening_hours_list %}"{{ item|escapejs }}"{% if not forloop.last %},{% endif %}{% endfor %}]{% endif %}
+      {% if review_summary %},
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "{{ review_summary.rating }}",
+        "reviewCount": "{{ review_summary.count }}"
+      },
+      "review": [
+        {% for review in review_summary.items %}
+        {
+          "@type": "Review",
+          "author": {"@type": "Person", "name": "{{ review.name|escapejs }}"},
+          "reviewRating": {"@type": "Rating", "ratingValue": "{{ review.rating }}", "bestRating": "5"},
+          "reviewBody": "{{ review.review|escapejs }}"
+        }{% if not forloop.last %},{% endif %}
+        {% endfor %}
+      ]{% endif %}
+    }
+    </script>
+
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="{% if is_rtl %}rtl{% endif %}" style="{{ theme_css_vars }}" data-track-url="{% url 'track_conversion' %}">
+    <a class="skip-link" href="#content">تخط إلى المحتوى</a>
+    {% include "partials/header.html" %}
+    <main id="content">
+        {% block content %}{% endblock %}
+    </main>
+    {% include "partials/footer.html" %}
+    {% include "partials/exit_intent_modal.html" %}
+    {% include "partials/conversion_bar.html" %}
+    <div class="floating-actions" aria-label="روابط التواصل السريعة">
+        <a class="floating-call" href="tel:{{ contact_phone }}" aria-label="Call">{{ contact_phone }}</a>
+        <a class="floating-whatsapp" href="{{ whatsapp_url }}" target="_blank" rel="noopener" aria-label="WhatsApp">واتساب</a>
+    </div>
+</body>
+</html>

@@ -1,0 +1,20 @@
+<div class="exit-modal" data-exit-modal hidden>
+    <div class="exit-modal-backdrop" data-exit-close></div>
+    <section class="exit-modal-panel" role="dialog" aria-modal="true" aria-label="احصل على سعر سريع">
+        <button class="exit-close" type="button" data-exit-close aria-label="إغلاق">×</button>
+        <span class="eyebrow">قبل أن تغادر</span>
+        <h2>احصل على سعر سريع للنخيل أو اللاندسكيب</h2>
+        <p>أرسل المدينة ونوع الخدمة، وسنفتح لك واتساب برسالة جاهزة حتى تحصل على عرض أسرع.</p>
+        <form class="quote-form exit-lead-form" data-whatsapp="{{ whatsapp_url }}" data-lead-url="{% url 'capture_lead' %}" data-track-url="{% url 'track_conversion' %}">
+            <input type="text" name="city" placeholder="المدينة">
+            <select name="service">
+                <option>توريد نخيل</option>
+                <option>تكريب أو تشذيب نخيل</option>
+                <option>لاندسكيب وتنسيق حدائق</option>
+                <option>ثيل أو عشب صناعي</option>
+                <option>شبوك أو مظلات</option>
+            </select>
+            <button class="btn btn-primary" type="submit">احصل على السعر</button>
+        </form>
+    </section>
+</div>

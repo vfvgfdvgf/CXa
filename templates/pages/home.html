@@ -1,0 +1,202 @@
+{% extends "base.html" %}
+{% load seo_images %}
+
+{% block extra_head %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "LocalBusiness",
+  "name": "{{ site_name }}",
+  "telephone": "{{ contact_phone }}",
+  "areaServed": "Saudi Arabia",
+  "url": "{{ seo.canonical }}",
+  "serviceType": [{% for item in service_highlights|slice:":6" %}"{{ item|escapejs }}"{% if not forloop.last %}, {% endif %}{% endfor %}]
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<section class="hero{% if hero_background %} hero-has-bg{% endif %}"{% if hero_background %} style="--hero-bg-image:url('{{ hero_background }}');"{% endif %}>
+    <div class="container hero-grid">
+        <div class="hero-copy reveal">
+            <span class="eyebrow">{% for item in service_highlights|slice:":3" %}{{ item }}{% if not forloop.last %} • {% endif %}{% endfor %}</span>
+            <h1>{{ hero_title }}</h1>
+            <p>{{ hero_text }}</p>
+            <div class="hero-actions">
+                <a class="btn btn-primary" href="{{ whatsapp_url }}" target="_blank" rel="noopener">{{ ui.quote }}</a>
+                <a class="btn btn-outline" href="tel:{{ contact_phone }}">{{ ui.call_now }}</a>
+            </div>
+            <div class="stats-grid">
+                {% for stat in stats %}
+                <article class="stat-card">
+                    <strong>{{ stat.value }}</strong>
+                    <span>{{ stat.label }}</span>
+                </article>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="hero-panel reveal">
+            <div class="hero-media-stack">
+                {% for item in hero_media|slice:":3" %}
+                {% if item.image_url %}
+                <figure class="hero-photo {% if forloop.first %}hero-photo-large{% endif %}">
+                    {% image_srcset item.image_url as srcset %}
+
+                    <img src="{{ item.image_url }}" {% if srcset %}srcset="{{ srcset }}" sizes="(max-width: 720px) 100vw, 50vw"{% endif %} alt="{{ item.display_alt }}" loading="eager">
+                </figure>
+                {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <div class="section-heading">
+            <span class="eyebrow">خدمات متخصصة</span>
+            <h2>حلول متكاملة للحدائق واللاندسكيب</h2>
+            <p>نقدم تنفيذًا احترافيًا بخيارات متعددة تناسب احتياجك وميزانيتك.</p>
+        </div>
+        <div class="cards-grid">
+            {% for service in services %}
+            <article class="service-card reveal" id="{{ service.slug }}">
+                {% if service.image %}{% image_srcset service.image as srcset %}
+<img src="{{ service.image }}" {% if srcset %}srcset="{{ srcset }}" sizes="(max-width: 720px) 100vw, 50vw"{% endif %} alt="{{ service.name }}" loading="lazy">{% endif %}
+                <h3>{{ service.name }}</h3>
+                <p>{{ service.description }}</p>
+                <ul>
+                    {% for benefit in service.benefits %}
+                    <li>{{ benefit }}</li>
+                    {% endfor %}
+                </ul>
+                <div class="service-links">
+                    <a class="btn btn-outline" href="{% url 'services' %}#{{ service.slug }}">تفاصيل أكثر</a>
+                    <a class="btn btn-primary" href="{{ whatsapp_url }}" target="_blank" rel="noopener">طلب سعر</a>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+{% if home_gallery %}
+<section class="section muted">
+    <div class="container">
+        <div class="section-heading">
+            <span class="eyebrow">معرض الأعمال</span>
+            <h2>صور من مشاريعنا المنفذة</h2>
+        </div>
+        <div class="photo-wall">
+            {% for item in home_gallery %}
+            <figure class="photo-wall-card reveal {% if forloop.counter|divisibleby:5 %}photo-wall-card-tall{% elif forloop.first %}photo-wall-card-wide{% endif %}">
+                {% image_srcset item.image_url as srcset %}
+
+                <img src="{{ item.image_url }}" {% if srcset %}srcset="{{ srcset }}" sizes="(max-width: 720px) 100vw, 50vw"{% endif %} alt="{{ item.display_alt }}" loading="lazy">
+            </figure>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+{% if home_gallery|length >= 2 %}
+<section class="section">
+    <div class="container">
+        <div class="section-heading split-heading">
+            <div>
+                <span class="eyebrow">قبل وبعد</span>
+                <h2>تصور الفرق قبل تنفيذ اللاندسكيب وبعد اكتمال النتيجة</h2>
+            </div>
+            <p>هذا القسم يساعد العميل يتخيل التحول، ويرفع الثقة قبل طلب المعاينة أو عرض السعر.</p>
+        </div>
+        <div class="before-after-showcase" data-before-after>
+            <div class="before-after-stage">
+                {% with before=home_gallery.0 after=home_gallery.1 %}
+                <img class="before-after-image" src="{{ after.image_url }}" alt="{{ after.display_alt }}" loading="lazy">
+                <div class="before-layer" data-before-layer>
+                    <img class="before-after-image" src="{{ before.image_url }}" alt="{{ before.display_alt }}" loading="lazy">
+                </div>
+                {% endwith %}
+                <div class="before-after-divider" data-before-divider></div>
+            </div>
+            <div class="before-after-controls">
+                <span>قبل</span>
+                <input type="range" min="0" max="100" value="50" data-before-range aria-label="مقارنة قبل وبعد">
+                <span>بعد</span>
+            </div>
+            <div class="hero-actions">
+                <a class="btn btn-primary" href="{{ whatsapp_url }}" target="_blank" rel="noopener">أريد نتيجة مشابهة</a>
+                <a class="btn btn-outline" href="{% url 'cost_calculator' %}">احسب تكلفة تقريبية</a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<section class="section muted">
+    <div class="container two-col two-col-top">
+        <div class="content-card">
+            <span class="eyebrow">طلب سريع</span>
+            <h2>أرسل صور الموقع ونوع الخدمة ونرد عليك بعرض مناسب</h2>
+            <p>سواء تحتاج توريد نخيل، تكريب أو تشذيب، لاندسكيب، أشجار، ثيل، شبوك أو مظلات، اكتب المدينة والتفاصيل وسيفتح واتساب برسالة جاهزة.</p>
+            <ul>
+                <li>رد سريع على الواتساب والاتصال.</li>
+                <li>تقدير أولي حسب الصور والمساحة.</li>
+                <li>اقتراح نوع النخيل أو الأشجار المناسب للموقع.</li>
+            </ul>
+        </div>
+        <form class="quote-form conversion-form-card" data-whatsapp="{{ whatsapp_url }}" data-lead-url="{% url 'capture_lead' %}">
+            <label>
+                الاسم
+                <input type="text" name="name" placeholder="اسمك">
+            </label>
+            <label>
+                المدينة
+                <input type="text" name="city" placeholder="مثال: الرياض">
+            </label>
+            <label>
+                الخدمة
+                <select name="service">
+                    <option>توريد نخيل</option>
+                    <option>تكريب أو تشذيب نخيل</option>
+                    <option>لاندسكيب وتنسيق حدائق</option>
+                    <option>توريد أشجار وثيل</option>
+                    <option>شبوك أو مظلات</option>
+                </select>
+            </label>
+            <label>
+                التفاصيل
+                <textarea name="details" rows="4" placeholder="اكتب المساحة أو أرسل الصور بعد فتح واتساب"></textarea>
+            </label>
+            <button class="btn btn-primary" type="submit">إرسال الطلب عبر واتساب</button>
+            <a class="btn btn-outline" href="tel:{{ contact_phone }}">أفضّل الاتصال المباشر</a>
+        </form>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container two-col two-col-top">
+        <div>
+            <div class="section-heading">
+                <span class="eyebrow">المدن</span>
+                <h2>نخدم معظم مدن السعودية</h2>
+            </div>
+            <div class="cities-cloud">
+                {% for city in featured_cities %}
+                <a href="{% url 'city_detail' city.slug %}">{{ city.name }}</a>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="trust-box reveal">
+            <h3>لماذا يختارنا العملاء؟</h3>
+            <ul>
+                <li>تنفيذ احترافي بخامات مناسبة للمناخ المحلي.</li>
+                <li>التزام بالمواعيد وجودة التشطيب.</li>
+                <li>خيارات متعددة: لاندسكيب، نخيل، شبوك، مظلات.</li>
+                <li>تواصل سريع عبر الاتصال والواتساب.</li>
+            </ul>
+        </div>
+    </div>
+</section>
+{% endblock %}
