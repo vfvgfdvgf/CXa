@@ -5,7 +5,7 @@ from django.conf import settings
 from django.db import models
 from django.core.cache import cache
 from django.http import Http404, HttpResponse, JsonResponse
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 from django.templatetags.static import static
 from django.urls import reverse
 from django.db.utils import OperationalError, ProgrammingError
@@ -918,6 +918,17 @@ def track_conversion(request):
         return JsonResponse({"ok": True, "event_id": event.pk})
     except (OperationalError, ProgrammingError):
         return JsonResponse({"ok": False, "error": "database_unavailable"}, status=503)
+
+
+def library_image_from_database(request, pk, filename):
+    item = get_object_or_404(LibraryImage, pk=pk, is_active=True)
+    if not item.image_data:
+        raise Http404
+
+    response = HttpResponse(bytes(item.image_data), content_type=item.image_content_type or "image/jpeg")
+    response["Cache-Control"] = "public, max-age=86400"
+    response["Content-Disposition"] = f'inline; filename="{item.image_filename or filename}"'
+    return response
 
 
 def contact(request):

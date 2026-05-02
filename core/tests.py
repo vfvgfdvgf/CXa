@@ -4,7 +4,7 @@ from django.test import Client, SimpleTestCase, TestCase, override_settings
 from django.urls import reverse
 
 from .local_seo import ensure_local_service_pages, seed_default_cities_and_services
-from .models import normalize_image_field_name
+from .models import LibraryImage, normalize_image_field_name
 
 
 @override_settings(DEBUG=True, ALLOWED_HOSTS=["localhost", "testserver"], SECURE_SSL_REDIRECT=False)
@@ -36,6 +36,23 @@ class PublicPageSmokeTests(TestCase):
             with self.subTest(url=url):
                 response = self.client.get(url)
                 self.assertEqual(response.status_code, 200)
+
+
+class LibraryImageDatabaseStorageTests(TestCase):
+    def test_library_image_can_be_served_from_database(self):
+        item = LibraryImage.objects.create(
+            source_name="sample.jpg",
+            title="Sample",
+            image_data=b"image-bytes",
+            image_content_type="image/jpeg",
+            image_filename="sample.jpg",
+        )
+
+        response = self.client.get(item.image_url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["Content-Type"], "image/jpeg")
+        self.assertEqual(response.content, b"image-bytes")
 
 
 class ProjectConfigurationTests(SimpleTestCase):

@@ -1,5 +1,9 @@
+import mimetypes
+from pathlib import PurePath
+
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.core.files.storage import default_storage
 from django.db import models
 from django.templatetags.static import static
 
@@ -295,6 +299,9 @@ class LibraryImage(TimeStampedModel):
     category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default="general")
     usage_group = models.CharField(max_length=30, choices=USAGE_GROUP_CHOICES, default="home_gallery")
     image = models.ImageField(upload_to="library-images/", blank=True, null=True)
+    image_data = models.BinaryField(blank=True, null=True, editable=False)
+    image_content_type = models.CharField(max_length=80, blank=True, editable=False)
+    image_filename = models.CharField(max_length=255, blank=True, editable=False)
     external_url = models.URLField(blank=True)
     sort_order = models.PositiveIntegerField(default=0)
     is_active = models.BooleanField(default=True)
@@ -311,10 +318,39 @@ class LibraryImage(TimeStampedModel):
         if self.image:
             self.image.name = normalize_image_field_name(self.image.name, "library-images")
             optimize_uploaded_image(self.image)
+            self.store_image_in_database()
         super().save(*args, **kwargs)
+
+    def store_image_in_database(self):
+        if not self.image:
+            return
+
+        data = b""
+        try:
+            self.image.open("rb")
+            data = self.image.read()
+            self.image.close()
+        except Exception:
+            try:
+                with default_storage.open(self.image.name, "rb") as image_file:
+                    data = image_file.read()
+            except Exception:
+                data = b""
+
+        if not data:
+            return
+
+        filename = PurePath(self.image.name).name or self.source_name or "library-image.jpg"
+        content_type = mimetypes.guess_type(filename)[0] or "image/jpeg"
+        self.image_data = data
+        self.image_filename = filename
+        self.image_content_type = content_type
 
     @property
     def image_url(self):
+        if self.image_data and self.pk:
+            filename = self.image_filename or PurePath(self.image.name or self.source_name or "image.jpg").name
+            return f"/media-db/library-images/{self.pk}/{filename}"
         if self.image:
             return self.image.url
         if self.external_url:

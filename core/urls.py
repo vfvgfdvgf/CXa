@@ -18,6 +18,7 @@ urlpatterns = [
     path("blog/<slug:post_slug>/track-read/", views.blog_track_read, name="blog_track_read"),
     path("lead/capture/", views.capture_lead, name="capture_lead"),
     path("conversion/track/", views.track_conversion, name="track_conversion"),
+    path("media-db/library-images/<int:pk>/<path:filename>", views.library_image_from_database, name="library_image_from_database"),
     path("contact/", views.contact, name="contact"),
     path("cost-calculator/", views.cost_calculator, name="cost_calculator"),
     path("cost-calculator/<slug:calculator_slug>/", views.cost_calculator_detail, name="cost_calculator_detail"),
