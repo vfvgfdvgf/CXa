@@ -1,4 +1,5 @@
 ﻿from django.conf import settings
+from django.core.cache import cache
 from django.db.utils import OperationalError, ProgrammingError
 from django.urls import NoReverseMatch, reverse
 
@@ -8,6 +9,10 @@ from .text_utils import fix_arabic_text
 
 
 def resolve_navigation_items():
+    cached_items = cache.get("site:navigation_items")
+    if cached_items is not None:
+        return cached_items
+
     items = []
     try:
         route_map = {
@@ -44,6 +49,7 @@ def resolve_navigation_items():
             items.append({"label": fix_arabic_text(page.menu_title or page.title), "url": url, "new_tab": False})
     except (OperationalError, ProgrammingError):
         return []
+    cache.set("site:navigation_items", items, 300)
     return items
 
 
@@ -67,6 +73,10 @@ def _to_whatsapp_digits(raw_phone):
 
 
 def site_defaults(request):
+    cached_defaults = cache.get("site:defaults")
+    if cached_defaults is not None:
+        return cached_defaults
+
     site_name = SITE_NAME
     phone = PHONE_NUMBER
     whatsapp_number = PHONE_NUMBER
@@ -144,7 +154,7 @@ def site_defaults(request):
     site_url = getattr(settings, "SITE_URL", "").rstrip("/") or request.build_absolute_uri("/").rstrip("/")
     site_domain = getattr(settings, "SITE_DOMAIN", "") or request.get_host()
 
-    return {
+    defaults = {
         "site_name": site_name,
         "contact_phone": phone,
         "contact_numbers": contact_numbers,
@@ -166,3 +176,5 @@ def site_defaults(request):
         "site_verifications": site_verifications,
         "review_summary": review_summary,
     }
+    cache.set("site:defaults", defaults, 300)
+    return defaults

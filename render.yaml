@@ -9,7 +9,7 @@ services:
       - getsiaq.online
       - www.getsiaq.online
     buildCommand: "pip install --upgrade pip && pip install -r requirements.txt && python manage.py collectstatic --noinput"
-    startCommand: "python manage.py migrate && python manage.py fix_library_image_paths && python manage.py boost_palm_landscape_seo && gunicorn project.wsgi:application --workers 2 --threads 4 --timeout 120 --log-file -"
+    startCommand: "python manage.py migrate && python manage.py ensure_admin_user && python manage.py fix_library_image_paths && gunicorn project.wsgi:application --workers 2 --threads 4 --timeout 120 --log-file -"
     disk:
       name: getsiaq-data
       mountPath: /var/data
@@ -45,6 +45,8 @@ services:
         value: "True"
       - key: WHITENOISE_MANIFEST_STRICT
         value: "False"
+      - key: DJANGO_CACHE_TIMEOUT
+        value: "300"
       - key: DJANGO_ENABLE_HTTPS_SECURITY
         value: "True"
       - key: DJANGO_SECURE_SSL_REDIRECT
@@ -61,3 +63,9 @@ services:
         sync: false
       - key: AI_DAILY_SEO_ENABLED
         value: "False"
+      - key: DJANGO_SUPERUSER_USERNAME
+        sync: false
+      - key: DJANGO_SUPERUSER_EMAIL
+        sync: false
+      - key: DJANGO_SUPERUSER_PASSWORD
+        sync: false

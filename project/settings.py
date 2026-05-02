@@ -299,6 +299,14 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # ======================
 # Security
 # ======================
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        "LOCATION": "getsiaq-online-cache",
+        "TIMEOUT": env_int("DJANGO_CACHE_TIMEOUT", 300),
+    }
+}
+
 USE_X_FORWARDED_HOST = True
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
