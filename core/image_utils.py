@@ -51,6 +51,8 @@ def optimize_uploaded_image(image_field, quality=82, max_size=(1600, 1600)):
     upload_dir = str(Path(image_field.name).parent)
     stem = Path(image_field.name).stem if image_field.name else "image"
     name = f"{stem}.jpg" if upload_dir in ("", ".") else f"{upload_dir}/{stem}.jpg"
-    image_field.save(name, ContentFile(buffer.getvalue()), save=False)
+    if default_storage.exists(name):
+        default_storage.delete(name)
+    image_field.name = default_storage.save(name, ContentFile(buffer.getvalue()))
     _save_variant(image, name, "webp", "WEBP")
     _save_variant(image, name, "avif", "AVIF", quality=62)

@@ -269,6 +269,7 @@ MEDIA_URL = "/media/"
 MEDIA_ROOT = Path(os.environ.get("MEDIA_ROOT", BASE_DIR / "media"))
 if not MEDIA_ROOT.is_absolute():
     MEDIA_ROOT = BASE_DIR / MEDIA_ROOT
+DJANGO_SERVE_MEDIA_FILES = env_bool("DJANGO_SERVE_MEDIA_FILES", bool(RENDER_EXTERNAL_HOSTNAME))
 
 
 # ======================

@@ -6,6 +6,23 @@ from django.templatetags.static import static
 from .image_utils import optimize_uploaded_image
 
 
+def normalize_image_field_name(name, upload_prefix):
+    if not name:
+        return name
+
+    clean_name = str(name).replace("\\", "/").lstrip("/")
+    media_prefix = settings.MEDIA_URL.strip("/")
+    if media_prefix and clean_name.startswith(f"{media_prefix}/"):
+        clean_name = clean_name[len(media_prefix) + 1 :]
+
+    upload_prefix = upload_prefix.strip("/")
+    repeated_prefix = f"{upload_prefix}/{upload_prefix}/"
+    while clean_name.startswith(repeated_prefix):
+        clean_name = f"{upload_prefix}/{clean_name[len(repeated_prefix):]}"
+
+    return clean_name
+
+
 class TimeStampedModel(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -292,6 +309,7 @@ class LibraryImage(TimeStampedModel):
 
     def save(self, *args, **kwargs):
         if self.image:
+            self.image.name = normalize_image_field_name(self.image.name, "library-images")
             optimize_uploaded_image(self.image)
         super().save(*args, **kwargs)
 
