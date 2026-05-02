@@ -110,7 +110,8 @@ The project includes `render.yaml` for deploying `getsiaq.online` from GitHub.
 
 - Render build command installs dependencies and runs `collectstatic`.
 - Render start command runs migrations, seeds SEO content, and starts Gunicorn.
-- SQLite is configured for `/var/data/db.sqlite3` on a persistent Render disk.
+- PostgreSQL is configured through the `DATABASE_URL` environment variable on Render.
+- SQLite remains the local fallback when `DATABASE_URL` is not set.
 - Uploaded media is configured for `/var/data/media` on the same disk.
 
 See `deploy/render.md` for the GitHub and Render steps.

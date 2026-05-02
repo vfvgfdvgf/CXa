@@ -2,10 +2,17 @@ import os
 from pathlib import Path
 import logging
 
+from django.core.exceptions import ImproperlyConfigured
+
 try:
     from dotenv import load_dotenv
 except Exception:
     load_dotenv = None
+
+try:
+    import dj_database_url
+except Exception:
+    dj_database_url = None
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -217,19 +224,35 @@ WSGI_APPLICATION = "project.wsgi.application"
 # ======================
 # Database
 # ======================
-# SQLite is the only configured database for this project. Use SQLITE_NAME to
-# override the file name/path without enabling external database backends.
-SQLITE_NAME = os.environ.get("SQLITE_NAME", "db.sqlite3").strip() or "db.sqlite3"
-SQLITE_PATH = Path(SQLITE_NAME)
-if not SQLITE_PATH.is_absolute():
-    SQLITE_PATH = BASE_DIR / SQLITE_PATH
+DATABASE_URL = os.environ.get("DATABASE_URL", "").strip()
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": SQLITE_PATH,
+if DATABASE_URL:
+    if dj_database_url is None:
+        raise ImproperlyConfigured(
+            "DATABASE_URL is set, but dj-database-url is not installed. "
+            "Run `pip install -r requirements.txt`."
+        )
+    DATABASES = {
+        "default": dj_database_url.parse(
+            DATABASE_URL,
+            conn_max_age=600,
+            conn_health_checks=True,
+            ssl_require=not DEBUG,
+        )
     }
-}
+else:
+    # Local fallback: keep development simple when DATABASE_URL is not provided.
+    SQLITE_NAME = os.environ.get("SQLITE_NAME", "db.sqlite3").strip() or "db.sqlite3"
+    SQLITE_PATH = Path(SQLITE_NAME)
+    if not SQLITE_PATH.is_absolute():
+        SQLITE_PATH = BASE_DIR / SQLITE_PATH
+
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": SQLITE_PATH,
+        }
+    }
 
 
 # ======================

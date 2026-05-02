@@ -18,6 +18,7 @@ Required values:
 - `SITE_DOMAIN=getsiaq.online`
 - `WWW_SITE_DOMAIN=www.getsiaq.online`
 - `SITE_URL=https://getsiaq.online`
+- `DATABASE_URL=postgresql://...` for PostgreSQL on Render. Use Render's internal URL only when the web service and database can reach each other on Render's private network; otherwise use the external URL.
 - `SQLITE_NAME=db.sqlite3` or an absolute persistent path
 - `OPENAI_API_KEY` only if AI generation is enabled
 

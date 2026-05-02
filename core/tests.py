@@ -38,7 +38,7 @@ class PublicPageSmokeTests(TestCase):
 
 
 class ProjectConfigurationTests(SimpleTestCase):
-    def test_sqlite_is_the_configured_database(self):
+    def test_sqlite_is_the_local_fallback_database(self):
         self.assertEqual(settings.DATABASES["default"]["ENGINE"], "django.db.backends.sqlite3")
 
     def test_root_image_assets_are_available_to_staticfiles(self):
