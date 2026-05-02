@@ -212,6 +212,14 @@ def with_fallback_media(items, fallback_items):
 
 
 def serialize_library_item(item):
+    if isinstance(item, dict):
+        return {
+            "filename": item.get("source_name", ""),
+            "image_url": item.get("image_url", ""),
+            "title": fix_arabic_text(item.get("title", "")),
+            "display_alt": fix_arabic_text(item.get("display_alt") or item.get("alt_text", "") or item.get("title", "")),
+            "category": item.get("category", "general"),
+        }
     return {
         "filename": item.source_name,
         "image_url": item.image_url,
@@ -242,8 +250,12 @@ def default_alt_for(filename):
 
 
 def get_library_records():
+    cached_records = cache.get("library:records")
+    if cached_records is not None:
+        return cached_records
+
     try:
-        existing = {item.source_name: item for item in LibraryImage.objects.all()}
+        existing = set(LibraryImage.objects.values_list("source_name", flat=True))
         missing = []
         for filename in STATIC_IMAGE_FILES:
             if filename not in existing:
@@ -260,7 +272,39 @@ def get_library_records():
                 )
         if missing:
             LibraryImage.objects.bulk_create(missing)
-        return list(LibraryImage.objects.filter(is_active=True))
+        records = []
+        for item in (
+            LibraryImage.objects.filter(is_active=True)
+            .defer("image_data")
+            .only(
+                "id",
+                "source_name",
+                "title",
+                "alt_text",
+                "category",
+                "usage_group",
+                "image",
+                "image_stored",
+                "image_filename",
+                "external_url",
+                "sort_order",
+            )
+        ):
+            records.append(
+                {
+                    "id": item.pk,
+                    "source_name": item.source_name,
+                    "title": item.title,
+                    "alt_text": item.alt_text,
+                    "display_alt": item.display_alt,
+                    "category": item.category,
+                    "usage_group": item.usage_group,
+                    "sort_order": item.sort_order,
+                    "image_url": item.image_url,
+                }
+            )
+        cache.set("library:records", records, 300)
+        return records
     except (OperationalError, ProgrammingError):
         return []
 
@@ -289,7 +333,7 @@ def assign_project_fallback_images(projects):
 
 def build_library_image(filename, title="", alt=""):
     records = get_library_records()
-    matched = next((item for item in records if item.source_name == filename), None)
+    matched = next((item for item in records if item.get("source_name") == filename), None)
     if matched:
         return serialize_library_item(matched)
     return {
@@ -302,7 +346,7 @@ def build_library_image(filename, title="", alt=""):
 
 
 def get_page_image_block(page_slug):
-    records = [serialize_library_item(item) for item in get_library_records() if item.usage_group == page_slug]
+    records = [serialize_library_item(item) for item in get_library_records() if item.get("usage_group") == page_slug]
     if records:
         return records
     filenames = IMAGE_GROUPS.get(page_slug)
@@ -312,7 +356,7 @@ def get_page_image_block(page_slug):
 
 
 def get_images_by_category(category, limit=4):
-    records = [serialize_library_item(item) for item in get_library_records() if item.category == category]
+    records = [serialize_library_item(item) for item in get_library_records() if item.get("category") == category]
     if records:
         return records[:limit]
     matches = [filename for filename in STATIC_IMAGE_FILES if IMAGE_METADATA.get(filename, {}).get("category") == category]
@@ -921,7 +965,11 @@ def track_conversion(request):
 
 
 def library_image_from_database(request, pk, filename):
-    item = get_object_or_404(LibraryImage, pk=pk, is_active=True)
+    item = get_object_or_404(
+        LibraryImage.objects.only("image_data", "image_content_type", "image_filename", "is_active"),
+        pk=pk,
+        is_active=True,
+    )
     if not item.image_data:
         raise Http404
 
@@ -1592,7 +1640,7 @@ def _all_sitemap_images(request):
         for item in PageMedia.objects.filter(is_active=True):
             if item.image_url:
                 images.append({"loc": _sitemap_absolute(request, item.image_url), "title": item.title})
-        for item in LibraryImage.objects.filter(is_active=True):
+        for item in LibraryImage.objects.filter(is_active=True).defer("image_data"):
             if item.image_url:
                 images.append({"loc": _sitemap_absolute(request, item.image_url), "title": item.title})
         for service in ServiceModel.objects.filter(is_visible=True):

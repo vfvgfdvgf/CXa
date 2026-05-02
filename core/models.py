@@ -300,6 +300,7 @@ class LibraryImage(TimeStampedModel):
     usage_group = models.CharField(max_length=30, choices=USAGE_GROUP_CHOICES, default="home_gallery")
     image = models.ImageField(upload_to="library-images/", blank=True, null=True)
     image_data = models.BinaryField(blank=True, null=True, editable=False)
+    image_stored = models.BooleanField(default=False, editable=False)
     image_content_type = models.CharField(max_length=80, blank=True, editable=False)
     image_filename = models.CharField(max_length=255, blank=True, editable=False)
     external_url = models.URLField(blank=True)
@@ -343,12 +344,13 @@ class LibraryImage(TimeStampedModel):
         filename = PurePath(self.image.name).name or self.source_name or "library-image.jpg"
         content_type = mimetypes.guess_type(filename)[0] or "image/jpeg"
         self.image_data = data
+        self.image_stored = True
         self.image_filename = filename
         self.image_content_type = content_type
 
     @property
     def image_url(self):
-        if self.image_data and self.pk:
+        if self.image_stored and self.pk:
             filename = self.image_filename or PurePath(self.image.name or self.source_name or "image.jpg").name
             return f"/media-db/library-images/{self.pk}/{filename}"
         if self.image:

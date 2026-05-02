@@ -252,6 +252,9 @@ class LibraryImageAdmin(SafeChangelistAdmin):
         ("استبدال الصورة", {"fields": ("image", "external_url")}),
     )
 
+    def get_queryset(self, request):
+        return super().get_queryset(request).defer("image_data")
+
     def get_urls(self):
         urls = super().get_urls()
         custom_urls = [

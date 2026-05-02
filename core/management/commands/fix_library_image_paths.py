@@ -1,5 +1,6 @@
 from django.core.management.base import BaseCommand
 from django.core.files.storage import default_storage
+from django.core.cache import cache
 from django.utils import timezone
 
 from core.models import LibraryImage, normalize_image_field_name
@@ -46,6 +47,7 @@ class Command(BaseCommand):
                 LibraryImage.objects.filter(pk=item.pk).update(
                     image=normalized_name,
                     image_data=item.image_data,
+                    image_stored=bool(item.image_data),
                     image_content_type=item.image_content_type,
                     image_filename=item.image_filename,
                     updated_at=timezone.now(),
@@ -54,4 +56,5 @@ class Command(BaseCommand):
         if dry_run:
             self.stdout.write(self.style.WARNING(f"Dry run complete. Paths to fix: {fixed_count}. Images to store in database: {stored_count}"))
         else:
+            cache.delete("library:records")
             self.stdout.write(self.style.SUCCESS(f"Library image paths fixed: {fixed_count}. Images stored in database: {stored_count}"))

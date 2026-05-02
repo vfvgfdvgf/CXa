@@ -44,6 +44,7 @@ class LibraryImageDatabaseStorageTests(TestCase):
             source_name="sample.jpg",
             title="Sample",
             image_data=b"image-bytes",
+            image_stored=True,
             image_content_type="image/jpeg",
             image_filename="sample.jpg",
         )

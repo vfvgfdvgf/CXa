@@ -3,11 +3,11 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 from .local_seo import build_city_service_seo
-from .models import City, CityServicePage, ContactNumber, LegacyRedirect, NavigationItem, Page, Service, SiteSettings, SiteVerification, Testimonial
+from .models import City, CityServicePage, ContactNumber, LegacyRedirect, LibraryImage, NavigationItem, Page, Service, SiteSettings, SiteVerification, Testimonial
 
 
 def clear_site_cache():
-    cache.delete_many(["site:defaults", "site:navigation_items"])
+    cache.delete_many(["site:defaults", "site:navigation_items", "library:records"])
 
 
 def _create_missing_pages_for(city=None, service=None):
@@ -57,6 +57,7 @@ def create_pages_after_service_save(sender, instance, **kwargs):
 @receiver(post_save, sender=NavigationItem)
 @receiver(post_save, sender=Page)
 @receiver(post_save, sender=Testimonial)
+@receiver(post_save, sender=LibraryImage)
 def clear_cached_site_defaults(sender, instance, **kwargs):
     clear_site_cache()
 
